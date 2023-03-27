@@ -1,1 +1,0 @@
-RewriteRule "^/test" "/view/test.txt"
