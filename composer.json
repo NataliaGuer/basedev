@@ -1,0 +1,13 @@
+{
+    "name": "www/rdb",
+    "type": "project",
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "model\\": "model/",
+            "controller\\": "controller/"
+        }
+    }
+}
