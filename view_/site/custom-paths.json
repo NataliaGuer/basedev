@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "baseUrl": "src",
+        "paths": {
+            "@shared/*": [
+                "shared/*"
+            ],
+            "@core/*": [
+                "core/*"
+            ],
+            "@services/*": [
+                "core/services/*"
+            ],
+            "@entities": [
+                "shared/entities/"
+            ],
+            "@features/*": [
+                "features/*"
+            ]
+        }
+    }
+}
