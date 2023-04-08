@@ -1,8 +1,11 @@
-import RoutesManager from '@core/components/routes-manager/routes-manager.component'
+import RoutesManager from "core/components/routes-manager/routes-manager.component";
 
-function App() {
+const App = () => { 
+    let ciao = 3;
+    debugger
     return (
         <>
+             <div>ciao</div>
             <RoutesManager />
         </>
     );

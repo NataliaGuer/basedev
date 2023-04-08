@@ -1,28 +1,7 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import {
-    createBrowserRouter,
-    RouterProvider,
-} from "react-router-dom";
+import ReactDOM from 'react-dom/client';
+import App from './App.tsx'
 
-import HomePage, { homepageLoader } from "./feature/homepage";
-import Team, { teamLoader } from "./routes/team";
+const root = ReactDOM.createRoot(document.getElementById('root'));
+debugger
 
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Homepage />,
-        loader: rootLoader,
-        children: [
-            {
-                path: "team",
-                element: <Team />,
-                loader: teamLoader,
-            },
-        ],
-    },
-]);
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-    <RouterProvider router={router} />
-);
+root.render(<App />);

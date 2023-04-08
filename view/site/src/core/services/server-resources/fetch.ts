@@ -1,4 +1,4 @@
-import { FetchParameters, Address } from '@entities'
+import { FetchParameters, Address } from 'entities'
 
 export class Fetch {
 

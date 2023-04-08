@@ -2,19 +2,19 @@
     "compilerOptions": {
         "baseUrl": "src",
         "paths": {
-            "@shared/*": [
+            "shared": [
                 "shared/*"
             ],
-            "@core/*": [
+            "core": [
                 "core/*"
             ],
-            "@services/*": [
+            "services": [
                 "core/services/*"
             ],
-            "@entities": [
+            "entities": [
                 "shared/entities/"
             ],
-            "@features/*": [
+            "features": [
                 "features/*"
             ]
         }
