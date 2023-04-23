@@ -1,16 +1,26 @@
 <?php
 
-//use Composer\Autoload\ClassLoader;
-// use model\database\Connection;
-// use PHPUnit\Framework\TestCase;
-
-use model\database\Connection;
+use model\database\query\where;
+use model\entity\Address;
+use model\table\AddressTable;
+use model\table\UserTable;
 
 require_once __DIR__ . '/vendor/autoload.php';
-// $loader = new ClassLoader();
+$addressTable = new AddressTable();
+$addressEntity = $addressTable->select()
+                    ->where(AddressTable::$tableName, Address::getColumnName("id"), where::EQUAL, 1)
+                    ->execute();
+$addressEntity->country = "italy";
+$addressTable->update($addressEntity);
 
-// $loader->register();
-// $loader->setUseIncludePath(true);
+$actual = $addressTable->select()
+            ->where(AddressTable::$tableName, Address::getColumnName("id"), where::EQUAL, 1)
+            ->execute();
 
-$connection = Connection::getConnection();
-var_dump($connection);
+print_r($actual);
+
+$actual = $addressTable->select()
+            ->where(AddressTable::$tableName, Address::getColumnName("id"), where::EQUAL, 1)
+            ->execute();
+
+print_r($actual);
