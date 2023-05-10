@@ -1,0 +1,69 @@
+# definizione scalari
+scalar DateTime
+
+# definizione tipi
+type category{
+    id: ID!,
+    fn: string,
+    parent: category
+}
+
+type product{
+    id: ID!,
+    """
+    il titolo del prodotto
+    """
+    fn: string,
+    description: string,
+    category: category,
+    price: float,
+    model: int,
+    avalability: int,
+    image: string
+}
+
+type userFullName {
+    given_name: string,
+    family_name: string
+}
+
+type address {
+    id: ID!,
+    # commentati per test (db di prova)
+    # street: string,
+    # city: string,
+    # region: string,
+    # postal_code: string,
+    country: string
+}
+
+type user {
+    id: ID!,
+    givenName: string,
+    familyName: string,
+    # commentati per test (db di prova)
+    # email: string,
+    # password: string,
+    # tel: string,
+    # bday: DateTime,
+    address: address
+}
+
+# definizione Query, Mutations e Subscriptions
+type Query {
+    getUser(id: ID!): user,
+    getAddress(userId: ID!): address,
+    getCategory(id: ID!): category
+}
+
+type Mutations {
+    addUser(fn: string, email: string, password: string, tel: string, bday: DateTime): user,
+    addCategory(fn: string, parent: category): category,
+    addProduct(fn: string, description: string, category: category, price: float, model: int, avalability: int, image: string): product
+}
+
+# schema
+schema {
+    query: Query,
+    mutation: Mutations
+}
