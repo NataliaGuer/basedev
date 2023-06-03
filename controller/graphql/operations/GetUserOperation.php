@@ -6,25 +6,14 @@ use controller\graphql\types\UserType;
 
 class GetUserOperation extends BaseOperation{
 
-    // in input
-    /*
-    getUser(id: $id){
-        n
-    }
-    variables: {
-       id: "1",
-    }
-    */
-    public function __construct($query, $variables)
+    public function __construct()
     {
-        $this->rawQuery = $query;
-        $this->type = OperationType::QUERY;
         $this->name = 'getUser';
-        $this->variables = [
-            "id" => $variables[$this->getQueryVariableNameFor("id")]
+        $this->type = OperationType::QUERY; 
+        $this->returnType = UserType::class; 
+
+        $this->requiredParams = [
+            "id" => "ID!"
         ];
-        $this->returnType = UserType::class;
-        //aggiunta metodo per settare a priori nel type il sottoinsieme di variabili desiderate
-        $this->setVariblesToReturn();
     }
 }

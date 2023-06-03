@@ -15,11 +15,13 @@ class UserType extends BaseType {
     // public DateTime $bday;
     public AddressType $address;
 
-    public function constructFromModel(User $user, Address $address){
+    public function constructFromModel(User $user, Address $address = null){
         $this->id = $user->id;
         $this->givenName = $user->name;
         $this->familyName = $user->surname;
         $addressType = new AddressType();
-        $this->address = $addressType->constructFromModel($address);
+        if ($address) {
+            $this->address = $addressType->constructFromModel($address);
+        }
     }
 }
