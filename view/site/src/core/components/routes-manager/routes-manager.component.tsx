@@ -1,27 +1,40 @@
-import { RoutingElement } from "@entities";
-import Homepage from "@features/homepage/homepage.component";
+import { RoutingElement } from "entities";
 import { useMemo } from "react";
-import { Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-export default () => {
+import Homepage from "../../../features/homepage/homepage.component";
+import PageNotFound from "../../../features/page-not-found/page-not-found.component";
 
+const RoutesManager = () => {
     const routingElements: RoutingElement[] = useMemo(
         () => {
             return [
                 {
                     route: '*',
+                    component: PageNotFound
+                },
+                {
+                    route: '/',
+                    component: Homepage
+                },
+                {
+                    route: '/ciao',
                     component: Homepage
                 }
             ]
         }, []
     )
-
     return (
-        <>
-            {routingElements.map(
-                    element => <Route path={element.route} Component={element.component}></Route> 
-                )
-            }
-        </>
+        <BrowserRouter>
+            <Routes>
+                {
+                    routingElements.map(
+                        element => <Route path={element.route} Component={element.component}></Route>
+                    )
+                }
+            </Routes>
+        </BrowserRouter>
     )
 }
+
+export default RoutesManager;
