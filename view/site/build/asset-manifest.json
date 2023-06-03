@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "http://www.rdb.com/view/site/build/static/js/main.3742d1b6.js",
+    "index.html": "http://www.rdb.com/view/site/build/index.html",
+    "main.3742d1b6.js.map": "http://www.rdb.com/view/site/build/static/js/main.3742d1b6.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.3742d1b6.js"
+  ]
+}

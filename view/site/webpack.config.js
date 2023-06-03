@@ -1,5 +1,4 @@
 const path = require('path');
-console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',__dirname);
 module.exports = {
     //mode: "production", 
     mode: "development", devtool: "inline-source-map",
