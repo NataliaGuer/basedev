@@ -1,8 +1,8 @@
 <?php
 
-namespace controller\graphql\schemaTypes;
+namespace controller\graphql\nodes;
 
-enum query: string {
+enum QueryType: string {
     case QUERY        = "query";
     case MUTATION     = "mutation";
     case SUBSCRIPTION = "subscription";

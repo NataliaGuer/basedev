@@ -4,3 +4,4 @@ view/site/node_modules/.
 notes.txt
 /tests/
 node_modules
+/env/

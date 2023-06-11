@@ -1,6 +1,6 @@
 <?php
 
-namespace controller\graphql\parse\nodes;
+namespace controller\graphql\nodes;
 
 class FieldArgumentNode {
     public string $name;

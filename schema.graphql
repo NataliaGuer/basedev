@@ -49,8 +49,11 @@ type user {
     address: address
 }
 
+union test = address | user
+
 # definizione Query, Mutations e Subscriptions
 type Query {
+    getTest(id: ID!): test
     getUser(id: ID!): user,
     getAddress(userId: ID!): address,
     getCategory(id: ID!): category

@@ -1,14 +1,14 @@
 <?php
 
-namespace controller\graphql\parse\nodes;
+namespace controller\graphql\nodes;
 
-use controller\graphql\schemaTypes\query as queryType;
+use controller\graphql\nodes\operations\OperationNode;
 
 class QueryNode {
     
     public string $name;
 
-    public queryType $type;
+    public QueryType $type;
     
     /** @var ParameterNode[] */
     public array $parameters;
@@ -16,7 +16,7 @@ class QueryNode {
     /** @var OperationNode[] */
     public array $operations;
 
-    public function getParameterFromAlias(string $alias){
+    public function getParameterFromAlias(string $alias): ?ParameterNode{
         $res = null;
         foreach($this->parameters as $parameter){
             if($parameter->alias === $alias){
@@ -26,4 +26,5 @@ class QueryNode {
         }
         return $res;
     }
+
 }

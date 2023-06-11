@@ -2,23 +2,24 @@
 
 namespace controller\graphql\parse;
 
-use controller\graphql\operations\BaseOperation;
-use controller\graphql\operations\OperationMapper;
-use controller\graphql\parse\nodes\FieldArgumentNode;
-use controller\graphql\parse\nodes\FieldNode;
-use controller\graphql\parse\nodes\OperationNode;
-use controller\graphql\parse\nodes\ParameterNode;
-use controller\graphql\parse\nodes\QueryNode;
-use controller\graphql\schemaTypes\query;
-use PhpParser\Node\Stmt\Foreach_;
+use controller\graphql\nodes\FieldArgumentNode;
+use controller\graphql\nodes\FieldNode;
+use controller\graphql\nodes\operations\OperationNode;
+use controller\graphql\nodes\ParameterNode;
+use controller\graphql\nodes\QueryNode;
+use controller\graphql\nodes\QueryType;
+use controller\graphql\nodes\types\union\BaseUnion;
+use controller\graphql\SchemaManager;
 
 class Parser
 {
     private QueryNode $queryNode;
+    private SchemaManager $schemaManager;
 
-    public function parseQuery($query)
+    public function parseQuery(string $query, array $variables)
     {
         $this->queryNode = new QueryNode();
+        $this->schemaManager = SchemaManager::getInstance();
         $res = $this->queryNode;
         try {
 
@@ -26,7 +27,9 @@ class Parser
 
             $this->queryNode->type = $this->parseType($query);
             $this->queryNode->name = $this->parseName($query);
-            $this->queryNode->parameters = $this->parseParameters($query);
+            $parameters = $this->parseParameters($query);
+            $this->setQueryParametersValue($variables, $parameters);
+            $this->queryNode->parameters = $parameters;
 
             $this->queryNode->operations = $this->parseOperations($query);
 
@@ -36,22 +39,10 @@ class Parser
         return $res;
     }
 
-    public function parseOperation(string $name, array $data): BaseOperation
-    {
-        $operationClass = OperationMapper::map($name);
-        /** @var BaseOperation */
-        $operation = new $operationClass();
-        foreach ($data["parameters"] as $name => $paramInfo) {
-            $operation->setParamAlias($name, $paramInfo["as"]);
-        }
-        $operation->setFieldsToReturn($data["fieldsToReturn"]);
-        return $operation;
-    }
-
     protected function parseType(&$query)
     {
-        $res = query::QUERY;
-        foreach (query::cases() as $type) {
+        $res = QueryType::QUERY;
+        foreach (QueryType::cases() as $type) {
             if (strpos($query, $type->value) !== false) {
                 $res = $type;
                 $query = substr_replace($query, "", 0, strlen($res->value));
@@ -100,15 +91,35 @@ class Parser
         return $res;
     }
 
+    protected function setQueryParametersValue(array $variables, array &$parameters){
+        foreach ($parameters as $parameter) {
+            if(array_key_exists($parameter->alias, $variables)){
+                $parameter->value = $variables[$parameter->alias];
+            }
+        }
+    }
+
     protected function parseOperations($query){
         $res = [];
         $body = $this->getBody($query);
         $operations = $this->extractOperations($body);
         foreach ($operations as $operation) {
-            $operationNode = new OperationNode();
-            $operationNode->name = $this->parseName($operation);
-            $operationNode->parameters = $this->parseParameters($operation);
-            $operationNode->fieldsToReturn = $this->parseOperationFields($this->getBody($operation));
+            $operationName = $this->parseName($operation);
+            $operationNode = $this->schemaManager->getOperation($operationName, $this->queryNode->type);
+            $operationNode->parameters = $this->parseOperationParameters($operation);
+            //differenziare comportamento -> standard, unioni
+            $operationBody = $this->getBody($operation);
+            if($this->schemaManager->operationReturnsUnion($operationNode)){
+                //array dei campi che devono essere restituiti per ogni possibile tipo dell'unione
+                $fieldsToReturn = $this->parseOperationFieldsByType($operationBody);
+                foreach ($fieldsToReturn as $typeName => $fields) {
+                    /** @var BaseUnion $result */
+                    $result = $operationNode->result;
+                    $result->setFieldsToReturn($fields, $typeName);
+                }
+            } else {
+                $operationNode->result->fieldsToReturn = $this->parseOperationFields($operationBody);
+            }
             $res[] = $operationNode;
         }
         return $res;
@@ -150,6 +161,19 @@ class Parser
             $i++;
         }
         return $operations;
+    }
+
+    protected function parseOperationParameters($operation){
+        $parameters = $this->parseParameters($operation);
+        foreach ($parameters as &$parameter) {
+            if(!$parameter->value){
+                //si prendono dal queryNode tutti i parametri dell'operazione che fanno riferimento
+                //a un parametro passato alla query
+                $queryParameter = $this->queryNode->getParameterFromAlias($parameter->alias);
+                $parameter->value = $queryParameter->value;
+            }
+        }
+        return $parameters;
     }
 
     protected function parseOperationFields($operation)
@@ -220,6 +244,17 @@ class Parser
         return $res;
     }
 
+    public function parseOperationFieldsByType($operation){
+        $cases = $this->extractOperations($operation);
+        $fieldsDividedByType = [];
+        foreach ($cases as $case) {
+            $on = trim(str_replace("...on", "", $this->parseName($case)));
+            $fields = $this->parseOperationFields($this->getBody($case));
+            $fieldsDividedByType[$on] = $fields;
+        }
+        return $fieldsDividedByType;
+    }
+
     protected function parseField($field){
         $fieldNode = new FieldNode();
         $fieldName = $field;
@@ -243,6 +278,12 @@ class Parser
                 }
                 $arguments[] = $arg;
             }
+        }
+        //il campo ha un alias quindi il suo name è alias:name
+        if (strpos($fieldName, ":") !== false) {
+            $fieldNameArray = explode(":", $fieldName);
+            $fieldNode->toReturnAs = $fieldNameArray[0];
+            $fieldName = $fieldNameArray[1];
         }
         $fieldNode->name = $fieldName;
         if ($arguments) {

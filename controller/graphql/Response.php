@@ -2,17 +2,20 @@
 
 namespace controller\graphql;
 
-use controller\graphql\operations\BaseOperation;
-use controller\graphql\types\BaseType;
+use controller\graphql\nodes\operations\OperationNode;
 
 class Response {
     public array $data;
     public $errors;
 
-    public function registerOperationResult(BaseOperation $operation, BaseType $result){
+    public function registerOperation(OperationNode $operation){
         //inserimento in data dell'associazione nome dell'operazione/campi valorizzati del type
         //esempio: operazione getUser:
-        $this->data[$operation->name] = $result->toArray($operation->getFieldsToReturn());
+        $this->data[$operation->name] = $operation->getResult();
+    }
+
+    public function registerError(Error $error){
+        
     }
 
     public function toArray(): array {
